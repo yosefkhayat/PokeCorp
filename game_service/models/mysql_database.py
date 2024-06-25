@@ -95,7 +95,7 @@ class Mysql_database(Database):
         return True
 
     def add_pokemon_to_trainer(self, trainer_id,pokemon_id):
-        query = f"""INSERT INTO team (trainer_id,pokemon_id) VALUES ('{trainer_id}', {pokemon_id})"""
+        query = f"""INSERT INTO team (trainer_id,pokemon_id) VALUES ('{trainer_id}', {pokemon_id});"""
         self.__execute_query(query, commit=True)
         return True
     

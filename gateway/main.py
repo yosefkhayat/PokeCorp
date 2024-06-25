@@ -3,7 +3,7 @@ from fastapi import Depends, FastAPI, HTTPException, Query
 import requests
 import uvicorn
 
-from models.entities_db import MySQL_Entities
+from models.entities_db import MySQL_Entities, PokeAPI_Entities
 from models.schema import Pokemon
 
 #from controllers import pokemon#, trainer
@@ -11,7 +11,7 @@ from models.schema import Pokemon
 server = FastAPI()
 #server.include_router(pokemon.router)
 e = MySQL_Entities("localhost:8000", "http")
-
+pokeApi = PokeAPI_Entities("pokeapi.co/api/v2/pokemon/","https")
 # if __name__ == "__main__":
 #     uvicorn.run(server, host="0.0.0.0", port=8001)
 
@@ -111,7 +111,7 @@ def create_pokemon(pokemon: Pokemon):
         return {"message": "Pokemon added successfully."}
 
 @server.put("/evolve-pokemon")
-def evolve_pokemon(pokemon:str,trainer:str, pokemon_db=Depends(get_db)):
+def evolve_pokemon(pokemon_name:str,trainer_name:str):
     """
 
     :param pokemon: the name of pokemon to be envolved.
@@ -119,22 +119,22 @@ def evolve_pokemon(pokemon:str,trainer:str, pokemon_db=Depends(get_db)):
     :param pokemon_db:  Dependency to fetch the database.
     :return:
     """
-    pokemon_id = pokemon_db.get_pokemon_by_name(pokemon)[0][0]
+    pokemon_id = e.get_pokemon_by_name(pokemon_name)[0]
     if not pokemon_id:
         raise HTTPException(status_code=404, detail="No Pokémon found with the given name")
-    trainer_id = pokemon_db.get_trainer_by_name(trainer)[0][0]
+    trainer_id = e.get_trainer_by_name(trainer_name)[0]
     if not trainer_id:
         raise HTTPException(status_code=404, detail="No Trainer found with the given name")
-    if not pokemon_db.check_trainer_and_pokemon(pokemon_id,trainer_id):
+    if not e.check_pokemon_is_with_trainer(pokemon_id,trainer_id):
         raise HTTPException(status_code=400, detail="Pokémon is not in trainer hand")
-    evolved_pokemon = evolution_handler.get_next_evolve_pokemon_name(pokemon)   
+    evolved_pokemon = pokeApi.get_next_evolve_pokemon_name(pokemon_name)   
     if not evolved_pokemon:
         raise HTTPException(status_code=403, detail="Pokémon has reach max evoloution")
-    evolved_pokemon_id = pokemon_db.get_pokemon_by_name(evolved_pokemon)[0][0]
-    if pokemon_db.check_trainer_and_pokemon(evolved_pokemon_id,trainer_id):
+    evolved_pokemon_id = e.get_pokemon_by_name(evolved_pokemon)[0]
+    if e.check_pokemon_is_with_trainer(evolved_pokemon_id,trainer_id):
         raise HTTPException(status_code=400, detail="can't evolve Pokémon, the trainer has the evolved pokemon in hand")
-    pokemon_db.delete_pokemon(pokemon,trainer)
-    pokemon_evolved = pokemon_db.add_pokemon_to_trainer(trainer_id,evolved_pokemon_id)
+    e.delete_pokemon_from_trainer(pokemon_id,trainer_id)
+    pokemon_evolved = e.add_pokemon_to_trainer(evolved_pokemon_id,trainer_id)
     if pokemon_evolved:
         print("Pokemon evolved successfully.")
         return {"message": "Pokemon evolved successfully."}
