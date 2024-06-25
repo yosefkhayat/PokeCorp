@@ -1,0 +1,21 @@
+# 
+FROM python:3.11.3
+
+# 
+WORKDIR /code
+
+# 
+COPY ./requirements.txt /code/requirements.txt
+
+# 
+RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+
+# 
+COPY . /code
+
+# 
+#CMD ["uvicorn", "db_server:server", "--host", "0.0.0.0", "--port", "8000"]
+# Default command
+
+# These commands will be replaced if user provides any command by himself
+CMD ["sh", "-c", "sleep 90 && uvicorn main:server --host 0.0.0.0 --port 8001"]
