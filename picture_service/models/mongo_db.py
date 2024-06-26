@@ -1,11 +1,11 @@
 from pymongo import MongoClient
-from gridfs import GridFS
+from gridfs import GridFS, NoFile
 import requests
 import io
 
 
 def get_db():
-    db = MongoDB(db_name='pokemon_pics')
+    db = MongoDB(db_name='pictures')
     return db
 
 class MongoDB:
@@ -37,7 +37,8 @@ class MongoDB:
             if response.status_code == 200:
                 image_data = response.content
                 image_stream = io.BytesIO(image_data)
-                return self.fs.put(image_stream, filename=image_name)
+                self.fs.put(image_stream, filename=image_name)
+                return
             else:
                 raise Exception(f"Failed to fetch image from URL: {image_url}")
         else:
@@ -45,13 +46,19 @@ class MongoDB:
     
     def find_image_by_id(self, image_id):
         if self.fs:
-            return self.fs.get(image_id)
+            try:
+                return self.fs.get(image_id)
+            except NoFile:
+                return None
         else:
             raise Exception("Database is not connected.")
     
     def find_image_by_name(self, image_name):
         if self.fs:
-            return self.fs.find_one({'filename': image_name})
+            try:
+                return self.fs.find_one({'filename': image_name})
+            except NoFile:
+                return None
         else:
             raise Exception("Database is not connected.")
     
