@@ -31,6 +31,16 @@ def get_pokemon(pokemon_id: Optional[int]=Query(None), pokemon_name: Optional[st
     raise HTTPException(status_code=400, detail="No Id, name or type was given")
 
 
+@router.get("/trainers")
+def get_pokemon_trainer(pokemon_name:str,pokemon_db=Depends(get_db))-> list | None:
+    """
+    Retrieves a list of trainers who own a Pokemon with the given name.
+    :param pokemon_name: the name of the pokemon to search for.
+    :param pokemon_db: Dependency to fetch the db
+    :return: A list of trainers who own pokemon
+    """
+    return pokemon_db.get_trainers_of_pokemon(pokemon_name)
+
 
 @router.post("/")
 def create_pokemon(pokemon: Pokemon, pokemon_db=Depends(get_db)):
@@ -61,12 +71,3 @@ def delete_pokemon_from_trainer(trainer_id: str, pokemon_id: str, pokemon_db=Dep
     return {"message": "Pokemon deleted successfully"}
     
     
-@router.get("/trainers")
-def get_pokemon_trainer(pokemon_name:str,pokemon_db=Depends(get_db))-> list | None:
-    """
-    Retrieves a list of trainers who own a Pokemon with the given name.
-    :param pokemon_name: the name of the pokemon to search for.
-    :param pokemon_db: Dependency to fetch the db
-    :return: A list of trainers who own pokemon
-    """
-    return pokemon_db.get_trainers_of_pokemon(pokemon_name)

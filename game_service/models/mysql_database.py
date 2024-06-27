@@ -38,7 +38,8 @@ class Mysql_database(Database):
             return [list(inner_list) for inner_list in query_res] or None
         return cursor.fetchone()
         
-    
+    # --------------------------------------------------------
+    # getting pokemons
     def get_pokemon_by_id(self, id: int):
         query = f"""SELECT * FROM pokemons WHERE id = '{id}'"""
         return self.__execute_query(query)
@@ -60,8 +61,8 @@ class Mysql_database(Database):
         WHERE t.name = '{trainer}';
         """
         return self.__execute_query(query,fetch_all=True)
-
-    
+    # ---------------------------------------------------------
+    #getting trainer
     def get_trainer_by_id(self, id: int):
         query = f"""SELECT * FROM trainers WHERE id = '{id}'"""
         return self.__execute_query(query)
@@ -77,7 +78,8 @@ class Mysql_database(Database):
     def get_trainers_of_pokemon(self, pokemon: str):
         query = f"SELECT t.name FROM trainers t join team on  t.id = team.trainer_id where team.pokemon_id = '{pokemon}'"
         return self.__execute_query(query,fetch_all=True)
-    
+    # ------------------------------------------------------------
+    #adding 
     def add_pokemonsTypes(self, pokemon_id: int, types: list):
         for type in types:
             query = f"""INSERT INTO pokemonsTypes (type_name, pokemon_id) VALUES ('{type}', {pokemon_id})"""
@@ -108,13 +110,15 @@ class Mysql_database(Database):
         except Exception as e:
             print(f"Error occurred: {e}")
             return False
-
+    # ------------------------------------------------------------------------------------------
+    #checking 
     def check_trainer_and_pokemon(self, pokemon_id: int, trainer_id:int):
         query = f"SELECT * from team where trainer_id={trainer_id} and pokemon_id={pokemon_id}"
         if self.__execute_query(query):
             return True
         return False
-
+    # ------------------------------------------------------------------------------------------
+    #delete
     def delete_pokemon(self,pokemon_id, trainer_id):
         query = f"DELETE FROM team WHERE trainer_id = {trainer_id} AND pokemon_id = {pokemon_id};"
         self.__execute_query(query,commit=True)
