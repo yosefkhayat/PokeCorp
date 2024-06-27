@@ -116,7 +116,7 @@ def create_pokemon(pokemon_name):
         image_service.post_image_by_pokemon_name(pokemon_name,image_url)
         return {"message": "Pokemon added successfully."}
     
-@server.put("/evolve-pokemon")
+@server.post("/evolve-pokemon")
 def evolve_pokemon(pokemon_name:str,trainer_name:str):
     """
 
