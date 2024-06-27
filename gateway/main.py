@@ -3,7 +3,7 @@ from fastapi import Depends, FastAPI, HTTPException, Query
 import requests
 import uvicorn
 
-from models.entities_db import MySQL_Entities, PokeAPI_Entities
+from models.entities_db import MySQL_Entities, PokeAPI_Entities, Images_Entities
 from models.schema import Pokemon
 
 #from controllers import pokemon#, trainer
@@ -12,6 +12,7 @@ server = FastAPI()
 #server.include_router(pokemon.router)
 e = MySQL_Entities("localhost:8000", "http")
 pokeApi = PokeAPI_Entities("pokeapi.co/api/v2/pokemon/","https")
+image_service = Images_Entities("localhost:8002","http")
 # if __name__ == "__main__":
 #     uvicorn.run(server, host="0.0.0.0", port=8001)
 
@@ -19,7 +20,7 @@ pokeApi = PokeAPI_Entities("pokeapi.co/api/v2/pokemon/","https")
 def get_pokemon_with_filtering(pokemon_name:Optional[str]=Query(None), pokemon_type: Optional[str] = Query(None)):
     """
     retreive pokemon with optinal filetering by trainer_name or pokemon type
-    :param pokemon_name: the name of trainer to filter by
+    :param pokemon_name: the names of the trainers to filter by
     :param pokemon_type: the type of pokemon to filter by
     :return:
     """
@@ -95,21 +96,26 @@ def add_pokemon_to_trainer(pokemon_name: str, trainer_name: str):
         return {"message": "Pokemon added successfully to trainer."}
 
 @server.post("/")
-def create_pokemon(pokemon: Pokemon):
+def create_pokemon(pokemon_name):
     """
     :param pokemon:  the pokemon data to be created
     :param pokemon_db:  Dependency to fetch the database.
     :return:
     """
-    existing_pokemon = e.get_pokemon_by_name(pokemon.name)
+    existing_pokemon = e.get_pokemon_by_name(pokemon_name)
     if existing_pokemon:
         raise HTTPException(status_code=409, detail="Pokemon found with the given name")
+    pokemon = pokeApi.get_pokemon_from_api(pokemon_name)
+    if not pokemon:
+        raise HTTPException(status_code=404, detail="Pokemon not found with the given name in the pokeApi")
+    image_url= pokeApi.get_image_url(pokemon_name)
+    if not image_url:
+        raise HTTPException(status_code=404, detail="Pokemon image not found with the given name in the pokeApi")
     pokemon_added = e.add_pokemon(pokemon)
     if pokemon_added:
-        ##  update status code 201***********
-        print("Pokemon added successfully.")
+        image_service.post_image_by_pokemon_name(pokemon_name,image_url)
         return {"message": "Pokemon added successfully."}
-
+    
 @server.put("/evolve-pokemon")
 def evolve_pokemon(pokemon_name:str,trainer_name:str):
     """
@@ -131,6 +137,9 @@ def evolve_pokemon(pokemon_name:str,trainer_name:str):
     if not evolved_pokemon:
         raise HTTPException(status_code=403, detail="Pokémon has reach max evoloution")
     evolved_pokemon_id = e.get_pokemon_by_name(evolved_pokemon)[0]
+    if not evolved_pokemon_id:
+        create_pokemon(evolved_pokemon)
+        evolved_pokemon_id = e.get_pokemon_by_name(evolved_pokemon)[0]
     if e.check_pokemon_is_with_trainer(evolved_pokemon_id,trainer_id):
         raise HTTPException(status_code=400, detail="can't evolve Pokémon, the trainer has the evolved pokemon in hand")
     e.delete_pokemon_from_trainer(pokemon_id,trainer_id)

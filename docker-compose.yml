@@ -41,6 +41,13 @@ services:
     build: ./gateway
     ports:
       - '8001:8001'
+  app3:
+    container_name: picture_container
+    build: ./picture_service
+    depends_on:
+        - mongo_db
+    ports:
+      - '8002:8002'
 volumes:
   mysql-db:
   mongo_db:

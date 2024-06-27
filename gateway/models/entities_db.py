@@ -1,5 +1,6 @@
 import requests
 from utils.route_generator import Route_generator as Generator
+from models.schema import Pokemon
 
 class Entities():
     def __init__(self,domain:str, protocol:str ,) -> None:
@@ -51,10 +52,29 @@ class MySQL_Entities(Entities):
         return True
     
 class PokeAPI_Entities(Entities):
+    def get_pokemon_from_api(self, pokemon_name):
+        """
+            retrieve a pokemon by its name from PokeAPI
+            :param pokemon_name: the name of pokemon to retrieve
+            :return: pokemon  chain data
+        """
+        url = self.generator.generate_route(pokemon_name)
+        response = requests.get(url)
+        if response.status_code==404:
+            return None
+        response.json()
+        pokemon_id = response["id"]
+        name= response["name"]
+        height= response["height"]
+        weight= response["weight"]
+        types = [inner_list["type"]["name"]for inner_list in response["types"]]
+        pokemon = Pokemon(id=pokemon_id,name=name,height=height,weight=weight,types=types)
+        return pokemon
+
     def get_pokemons_evolve_chain(self, pokemon_name):
         """
             retrieve a pokemon chain by its name from PokeAPI
-            :param pokemon: the name of pokemon to retrieve
+            :param pokemon_name: the name of pokemon to retrieve
             :return: pokemon  chain data
         """
         url = self.generator.generate_route(pokemon_name)
@@ -79,3 +99,21 @@ class PokeAPI_Entities(Entities):
         except IndexError:
             return None
         return result
+    
+    def get_image_url(self, pokemon_name):
+        url = self.generator.generate_route(pokemon_name)
+        response = requests.get(url)
+        if response.status_code==404:
+            return None
+        response = response.json()
+        return response["sprites"]["front_default"]
+
+class Images_Entities(Entities):
+    def post_image_by_pokemon_name(self, pokemon_name,picture_url):
+        url = self.generator.generate_route("/",params={"image_url":picture_url,"pokemon_name":pokemon_name})
+        requests.post(url).json()
+        return
+
+    
+
+        
