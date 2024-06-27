@@ -46,9 +46,9 @@ class MySQL_Entities(Entities):
         requests.post(url).json()
         return True
     
-    def add_pokemon(self,pokemon):
-        url = self.generator.generate_route("pokemon/",params={"pokemon": pokemon})
-        requests.post(url).json()
+    def add_pokemon(self,pokemon:Pokemon):
+        url = self.generator.generate_route("pokemon/")
+        requests.post(url,json=pokemon.model_dump()).json()
         return True
     
 class PokeAPI_Entities(Entities):
@@ -62,7 +62,8 @@ class PokeAPI_Entities(Entities):
         response = requests.get(url)
         if response.status_code==404:
             return None
-        response.json()
+        response = response.json()
+        
         pokemon_id = response["id"]
         name= response["name"]
         height= response["height"]
@@ -110,7 +111,7 @@ class PokeAPI_Entities(Entities):
 
 class Images_Entities(Entities):
     def post_image_by_pokemon_name(self, pokemon_name,picture_url):
-        url = self.generator.generate_route("/",params={"image_url":picture_url,"pokemon_name":pokemon_name})
+        url = self.generator.generate_route("",params={"image_url":picture_url,"pokemon_name":pokemon_name})
         requests.post(url).json()
         return
 
