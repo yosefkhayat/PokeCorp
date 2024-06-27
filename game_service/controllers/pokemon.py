@@ -57,7 +57,7 @@ def delete_pokemon_from_trainer(trainer_id: str, pokemon_id: str, pokemon_db=Dep
     :param pokemon_db: Dependency to fetch the database.
     :return:
     """
-    pokemon_db.delete_pokemon( pokemon_id,trainer_id)
+    pokemon_db.delete_pokemon(pokemon_id,trainer_id)
     return {"message": "Pokemon deleted successfully"}
     
     
