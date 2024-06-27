@@ -1,10 +1,7 @@
-from typing import Optional
+
 from fastapi import Depends, FastAPI, HTTPException, Query
-import requests
-import uvicorn
 from models.mongo_db import get_db
 
-#from controllers import pokemon#, trainer
 
 server = FastAPI()
 

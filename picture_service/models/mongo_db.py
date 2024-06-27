@@ -9,6 +9,7 @@ def get_db():
     return db
 
 class MongoDB:
+    #initialization
     def __init__(self, host='localhost', port=27017, db_name=None):
         self.host = host
         self.port = port
@@ -17,7 +18,8 @@ class MongoDB:
         self.db = None
         self.fs = None
         self.connect()
-    
+    #--------------------------------------------------------------------
+    #connectivity
     def connect(self):
         self.client = MongoClient(self.host, self.port)
         if self.db_name:
@@ -30,7 +32,8 @@ class MongoDB:
             self.client = None
             self.db = None
             self.fs = None
-    
+    #---------------------------------------------------------------
+    #insertion of image
     def insert_image_from_url(self, image_url, image_name=None):
         if self.fs:
             response = requests.get(image_url)
@@ -43,7 +46,8 @@ class MongoDB:
                 raise Exception(f"Failed to fetch image from URL: {image_url}")
         else:
             raise Exception("Database is not connected.")
-    
+    #---------------------------------------------------------------
+    #getting images by types
     def find_image_by_id(self, image_id):
         if self.fs:
             try:
@@ -61,13 +65,15 @@ class MongoDB:
                 return None
         else:
             raise Exception("Database is not connected.")
-    
+    #----------------------------------------------------------
+    #delete images
     def delete_image(self, image_id):
         if self.fs:
             self.fs.delete(image_id)
         else:
             raise Exception("Database is not connected.")
-        
+    #------------------------------------------------------
+    #return image as Bytes
     def read_image(self, image):
         if image:
             # Read the data from GridFS
