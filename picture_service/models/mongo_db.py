@@ -10,7 +10,7 @@ def get_db():
 
 class MongoDB:
     #initialization
-    def __init__(self, host='localhost', port=27017, db_name=None):
+    def __init__(self, host='mongo_container', port=27017, db_name=None):
         self.host = host
         self.port = port
         self.db_name = db_name

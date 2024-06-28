@@ -13,8 +13,8 @@ class Mysql_database(Database):
     def __init__(self):
         self.config = {
             'user': 'root',
-            #'host': 'mysql_db',
-            'host' : 'localhost',
+            'host': 'mysql_container',
+            #'host' : 'localhost',
             'port': '3306',
             'database': 'db_pokemon'
         }

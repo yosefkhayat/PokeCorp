@@ -10,9 +10,9 @@ from models.schema import Pokemon
 
 server = FastAPI()
 #server.include_router(pokemon.router)
-e = MySQL_Entities("localhost:8000", "http")
+e = MySQL_Entities("game_service_container:8000", "http")
 pokeApi = PokeAPI_Entities("pokeapi.co/api/v2/pokemon/","https")
-image_service = Images_Entities("localhost:8002","http")
+image_service = Images_Entities("picture_container:8002","http")
 # if __name__ == "__main__":
 #     uvicorn.run(server, host="0.0.0.0", port=8001)
 

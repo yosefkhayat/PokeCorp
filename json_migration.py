@@ -5,31 +5,32 @@ import requests
 import pymongo
 from gridfs import GridFS
 
-json_url="./pokemons_data.json"
+JSON_URL="./pokemons_data.json"
 POKEMONAPI_URL = "https://pokeapi.co/api/v2/pokemon/"
 
-config = {
+MYSQL_CONFIG = {
     'user': 'root',
-    'host': 'localhost',
+    'host': 'mysql_container',
     'port': '3306',
     'database': 'db_pokemon'
 }
 
-mongo_config = {
-    "url":"mongodb://localhost:27017/",
+MONGO_CONFIG = {
+    "url":"mongodb://mongo_container:27017/",
     "database":"pictures"
 }
 
 def read_json():
-    with open(json_url, 'r') as file:
+    with open(JSON_URL, 'r') as file:
         data = json.load(file)
     return data
 
-mydb = mysql.connector.connect(**config)
+
+mydb = mysql.connector.connect(**MYSQL_CONFIG)
 cursor = mydb.cursor()
 
-myclient = pymongo.MongoClient(mongo_config["url"])
-mongodb = myclient[mongo_config["database"]]
+myclient = pymongo.MongoClient(MONGO_CONFIG["url"])
+mongodb = myclient[MONGO_CONFIG["database"]]
 fs = GridFS(mongodb)
 
 

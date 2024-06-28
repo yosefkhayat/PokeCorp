@@ -33,7 +33,7 @@ services:
     container_name: game_service_container
     build: ./game_service
     depends_on:
-        - mysql_db
+        - seeding_data
     ports:
         - "8000:8000"
   app2:
@@ -45,9 +45,14 @@ services:
     container_name: picture_container
     build: ./picture_service
     depends_on:
-        - mongo_db
+        - seeding_data
     ports:
       - '8002:8002'
+  seeding_data:
+    build: ./
+    depends_on:
+      - mongo_db
+      - mysql_db
 volumes:
   mysql-db:
   mongo_db:
