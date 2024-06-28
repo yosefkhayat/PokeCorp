@@ -1,3 +1,4 @@
+import io
 from pydantic import BaseModel
 from typing import List
 
@@ -8,4 +9,3 @@ class Pokemon(BaseModel):
     height: float
     weight: float
     types: List[str] = []
-

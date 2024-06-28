@@ -52,6 +52,10 @@ class Mysql_database(Database):
         query = f"SELECT p.name FROM pokemons p join pokemonsTypes pt on  p.id = pt.pokemon_id where pt.type_name = '{type}'"
         return self.__execute_query(query,fetch_all=True)
     
+    def get_pokemon_types(self, pokemon_name):
+        query = f""" SELECT pt.type_name FROM pokemonsTypes pt join pokemons p on  p.id = pt.pokemon_id where p.name = '{pokemon_name}'"""
+        return self.__execute_query(query,fetch_all=True)
+        
     def get_pokemons_by_trainer(self, trainer: str):
         query = f"""
         SELECT p.name

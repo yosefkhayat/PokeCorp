@@ -1,7 +1,7 @@
 from typing import Optional
-from fastapi import Depends, FastAPI, HTTPException, Query
-import requests
-import uvicorn
+from fastapi import  FastAPI, HTTPException, Query
+
+
 
 from models.entities_db import MySQL_Entities, PokeAPI_Entities, Images_Entities
 from models.schema import Pokemon
@@ -15,6 +15,20 @@ pokeApi = PokeAPI_Entities("pokeapi.co/api/v2/pokemon/","https")
 image_service = Images_Entities("picture_container:8002","http")
 # if __name__ == "__main__":
 #     uvicorn.run(server, host="0.0.0.0", port=8001)
+
+@server.get("/pokemon")
+def get_pokemon_specie(pokemon_specie):
+    """
+    retreive pokemon specie by name
+    :param pokemon_specie: the name of the specie
+    :return: id, name, height, weight, types (all of them). And the Pokémon image 
+    """
+    pokemon_details = e.get_pokemon_by_name(pokemon_specie)
+    if not pokemon_details:
+            raise HTTPException(status_code=404, detail="No Pokemon found for the given name")
+    image = image_service.get_image_by_pokemon_name(pokemon_specie)
+    pokemon ={ "id": pokemon_details[0], "name":pokemon_details[1], "height" : pokemon_details[2], "weight" : pokemon_details[3], "types": pokemon_details[4], "image": image}
+    return pokemon
 
 @server.get("/")
 def get_pokemon_with_filtering(pokemon_name:Optional[str]=Query(None), pokemon_type: Optional[str] = Query(None)):

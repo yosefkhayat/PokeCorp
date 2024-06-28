@@ -111,10 +111,12 @@ class PokeAPI_Entities(Entities):
 
 class Images_Entities(Entities):
     def post_image_by_pokemon_name(self, pokemon_name,picture_url):
-        url = self.generator.generate_route("",params={"image_url":picture_url,"pokemon_name":pokemon_name})
+        url = self.generator.generate_route("",params={"image_url": picture_url,"pokemon_name": pokemon_name})
         requests.post(url).json()
         return
-
-    
+    def get_image_by_pokemon_name(self, pokemon_name):
+        url = self.generator.generate_route("",params={"pokemon_name": pokemon_name})
+        image = requests.get(url)
+        return image
 
         

@@ -23,7 +23,10 @@ def get_pokemon(pokemon_id: Optional[int]=Query(None), pokemon_name: Optional[st
     if pokemon_id:
         return pokemon_db.get_pokemon_by_id(pokemon_id)
     if pokemon_name:
-        return pokemon_db.get_pokemon_by_name(pokemon_name)
+        pokemon = list(pokemon_db.get_pokemon_by_name(pokemon_name))
+        types = pokemon_db.get_pokemon_types(pokemon_name)
+        pokemon.append(types)
+        return pokemon
     if pokemon_type:
         res =  pokemon_db.get_pokemon_by_type(pokemon_type)
         print(res)
